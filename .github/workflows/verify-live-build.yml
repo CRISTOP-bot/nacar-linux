@@ -6,7 +6,10 @@ permissions:
 jobs:
   build-and-inspect:
     runs-on: ubuntu-24.04
-    container: debian:trixie-slim
+    container:
+      image: debian:trixie-slim
+      # live-build must mount /proc and /dev/pts inside its chroot.
+      options: --cap-add SYS_ADMIN
     timeout-minutes: 120
     steps:
       - name: Check out source
@@ -18,7 +21,14 @@ jobs:
           apt-get install --yes --no-install-recommends \
             bash ca-certificates dosfstools grub-efi-amd64-bin grub-pc-bin \
             live-build mtools rsync squashfs-tools syslinux-common \
-            syslinux-utils xorriso
+            syslinux-utils util-linux xorriso
+      - name: Verify chroot mount capability
+        run: |
+          set -euo pipefail
+          probe="$(mktemp -d)"
+          trap 'umount "$probe" 2>/dev/null || true; rmdir "$probe"' EXIT
+          mount -t tmpfs tmpfs "$probe"
+          umount "$probe"
       - name: Build the experimental ISO
         run: ./build.sh
       - name: Verify checksums and packaged boot/credential files

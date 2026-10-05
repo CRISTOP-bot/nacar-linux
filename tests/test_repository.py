@@ -81,6 +81,8 @@ class RepositoryPolicyTests(unittest.TestCase):
         workflow = (ROOT / ".github/workflows/verify-live-build.yml").read_text()
         verifier = (ROOT / "tests/verify_live_image.sh").read_text()
         self.assertIn("workflow_dispatch:", workflow)
+        self.assertIn("options: --cap-add SYS_ADMIN", workflow)
+        self.assertIn("Verify chroot mount capability", workflow)
         self.assertIn("bash tests/verify_live_image.sh", workflow)
         self.assertNotIn("gh release create", workflow)
         self.assertNotIn("upload-artifact", workflow)
