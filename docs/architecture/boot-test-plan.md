@@ -1,6 +1,6 @@
 # Boot test plan (release gate)
 
-No test result is recorded until these steps run against a built image.
+No test result is recorded until these steps run against a built image. The manual build verifier also checks that the installed live-config user-setup component sorts before its hooks component; this structural check does not prove runtime execution or user creation.
 
 ## Test matrix
 

@@ -39,5 +39,27 @@ for file in \
     usr/lib/live/config-hooks/9999-nacar-live-credentials; do
     [ -x "$ROOTFS/$file" ] || { printf 'Missing or non-executable image file: /%s\n' "$file" >&2; exit 1; }
 done
+
+# live-config components run in numeric filename order; the user's account
+# must exist before the custom filesystem hook is executed by the hooks component.
+COMPONENT_DIR="$ROOTFS/usr/lib/live/config"
+USER_SETUP="$(find "$COMPONENT_DIR" -maxdepth 1 -type f -name '*-user-setup' -print -quit)"
+HOOK_RUNNER="$(find "$COMPONENT_DIR" -maxdepth 1 -type f -name '*-hooks' -print -quit)"
+[ -n "$USER_SETUP" ] || { printf 'Cannot locate live-config user-setup component.\n' >&2; exit 1; }
+[ -n "$HOOK_RUNNER" ] || { printf 'Cannot locate live-config hooks component.\n' >&2; exit 1; }
+component_order() {
+    component_name=${1##*/}
+    case "$component_name" in
+        [0-9][0-9][0-9][0-9]-*) printf '%s\n' "${component_name%%-*}" ;;
+        *) return 1 ;;
+    esac
+}
+USER_ORDER="$(component_order "$USER_SETUP")" || { printf 'Unexpected user-setup component name: %s\n' "$USER_SETUP" >&2; exit 1; }
+HOOK_ORDER="$(component_order "$HOOK_RUNNER")" || { printf 'Unexpected hooks component name: %s\n' "$HOOK_RUNNER" >&2; exit 1; }
+if [ "$USER_ORDER" -ge "$HOOK_ORDER" ]; then
+    printf 'Unsafe live-config order: user setup %s must precede hooks %s.\n' "$USER_SETUP" "$HOOK_RUNNER" >&2
+    exit 1
+fi
+printf 'live-config order verified: %s precedes %s.\n' "${USER_SETUP##*/}" "${HOOK_RUNNER##*/}"
 printf '%s\n' 'ISO package inventory, OpenRC init, credential tools, and executable hook verified.'
 printf '%s\n' 'This check does not prove boot, PID 1, network, or hook order.'

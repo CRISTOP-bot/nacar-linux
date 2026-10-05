@@ -43,7 +43,7 @@ Run from a clean clone:
 
 The script checks prerequisites, configures a fresh temporary build tree, invokes Debian `live-build`, and writes the ISO, TSV package inventory, builder/source metadata, and checksums under `dist/`. It refuses to overwrite matching outputs. Build artifacts and caches are excluded from Git. `./build.sh --check` checks local prerequisites without building.
 
-The local environment used to prepare this baseline had no Git, `live-build`, `xorriso`, `debootstrap`, or QEMU, so no ISO has been built or boot-tested here. GitHub Actions now has a manually dispatched build-verification workflow that inspects package contents and the credential hook without uploading the ISO; it has not yet been run and does not boot-test the image. A `v*` tag triggers the separate release workflow, gated by `RELEASE_STATUS=release-ready` and a tag matching `VERSION`; the status remains `blocked`. See `ROADMAP.md` and `docs/architecture/decisions/0001-bootstrap-and-live-builder.md`.
+The local environment used to prepare this baseline had no Git, `live-build`, `xorriso`, `debootstrap`, or QEMU, so no ISO has been built or boot-tested here. GitHub Actions has a manually dispatched build-verification workflow that inspects package contents, the credential hook, and live-config ordering without uploading the ISO; it does not boot-test the image. A `v*` tag triggers the separate release workflow, gated by `RELEASE_STATUS=release-ready` and a tag matching `VERSION`; the status remains `blocked`. See `ROADMAP.md` and `docs/architecture/decisions/0001-bootstrap-and-live-builder.md`.
 
 ## Development and tests
 

@@ -86,6 +86,8 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertNotIn("upload-artifact", workflow)
         self.assertIn("usr/lib/live/config-hooks/9999-nacar-live-credentials", verifier)
         self.assertIn("openrc-init", verifier)
+        self.assertIn("USER_ORDER", verifier)
+        self.assertIn("HOOK_ORDER", verifier)
         self.assertIn("does not prove boot", verifier)
 
     def test_release_workflow_is_blocked_until_review(self):
