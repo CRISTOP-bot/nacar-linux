@@ -46,7 +46,7 @@ class IsoBrandingTests(unittest.TestCase):
             isolinux.mkdir()
             grub.mkdir()
             (isolinux / "menu.cfg").write_text("menu title Nacar GNU/Linux Live\n", encoding="utf-8")
-            (grub / "grub.cfg").write_text("menuentry 'Nacar GNU/Linux Live' {\n}\n", encoding="utf-8")
+            (grub / "grub.cfg").write_text("menuentry 'Nacar GNU/Linux Live' --class debian {\n}\n", encoding="utf-8")
             self.assertEqual(check_boot_configs([isolinux, grub]), (2, 2))
 
     def test_extracted_boot_menus_reject_debian_branding(self):

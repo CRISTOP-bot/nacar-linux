@@ -25,6 +25,18 @@ def is_comment(line: str) -> bool:
     return stripped.startswith(("#", ";", "//", "/*", "*"))
 
 
+def visible_span(line: str) -> tuple[int, int]:
+    directive = VISIBLE_DIRECTIVE.match(line)
+    if directive is None:
+        return (0, 0)
+    normalized = " ".join(directive.group(0).lower().split())
+    if normalized in {"menuentry", "submenu"}:
+        quoted = re.search(r"(['\"])(.*?)(?<!\\)\1", line[directive.end() :])
+        if quoted:
+            return (directive.end() + quoted.start(2), directive.end() + quoted.end(2))
+    return (directive.end(), len(line.rstrip("\r\n")))
+
+
 def brand_bootloaders(root: Path) -> int:
     if not root.is_dir():
         raise ValueError(f"bootloader template directory does not exist: {root}")
@@ -52,9 +64,11 @@ def brand_bootloaders(root: Path) -> int:
                 newline = "\r\n" if line.endswith("\r\n") else "\n" if line.endswith("\n") else ""
                 branded = f"{title.group(1)}Nacar GNU/Linux Live{newline}"
             else:
-                branded = line
+                start, end = visible_span(line)
+                visible = line[start:end]
                 for pattern, replacement in REPLACEMENTS:
-                    branded = pattern.sub(replacement, branded)
+                    visible = pattern.sub(replacement, visible)
+                branded = line[:start] + visible + line[end:]
             if branded != line:
                 dirty = True
                 changed += 1
@@ -75,8 +89,11 @@ def brand_bootloaders(root: Path) -> int:
         except UnicodeDecodeError:
             continue
         for number, line in enumerate(lines, start=1):
-            if not is_comment(line) and VISIBLE_DIRECTIVE.match(line) and DEBIAN.search(line):
-                remaining.append(f"{path}:{number}: {line.strip()}")
+            if is_comment(line) or not VISIBLE_DIRECTIVE.match(line):
+                continue
+            start, end = visible_span(line)
+            if DEBIAN.search(line[start:end]):
+                remaining.append(f"{path}:{number}: {line[start:end].strip()}")
     if remaining:
         raise ValueError("Debian branding remains in visible boot directives:\n" + "\n".join(remaining))
     return changed

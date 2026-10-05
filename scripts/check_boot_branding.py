@@ -14,6 +14,18 @@ DEBIAN = re.compile(r"\bdebian\b", re.IGNORECASE)
 NACAR = re.compile(r"\bnacar\b", re.IGNORECASE)
 
 
+def visible_text(line: str) -> str:
+    directive = VISIBLE_DIRECTIVE.match(line)
+    if directive is None:
+        return ""
+    normalized = " ".join(directive.group(0).lower().split())
+    if normalized in {"menuentry", "submenu"}:
+        quoted = re.search(r"(['\"])(.*?)(?<!\\)\1", line[directive.end() :])
+        if quoted:
+            return quoted.group(2)
+    return line[directive.end() :].rstrip("\r\n")
+
+
 def check_boot_configs(roots: list[Path]) -> tuple[int, int]:
     violations: list[str] = []
     branded = 0
@@ -36,9 +48,10 @@ def check_boot_configs(roots: list[Path]) -> tuple[int, int]:
                 if stripped.startswith(("#", ";", "//", "/*", "*")) or not VISIBLE_DIRECTIVE.match(line):
                     continue
                 directives += 1
-                if DEBIAN.search(line):
-                    violations.append(f"{path}:{number}: {line.strip()}")
-                if NACAR.search(line):
+                label = visible_text(line)
+                if DEBIAN.search(label):
+                    violations.append(f"{path}:{number}: {label.strip()}")
+                if NACAR.search(label):
                     branded += 1
     if violations:
         raise ValueError("Debian appears in visible boot directives:\n" + "\n".join(violations))

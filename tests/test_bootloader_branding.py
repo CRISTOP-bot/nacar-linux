@@ -24,7 +24,7 @@ class BootloaderBrandingTests(unittest.TestCase):
             )
             grub.write_text(
                 "# Debian notice remains intact\n"
-                "menuentry 'Debian GNU/Linux Live (amd64)' --id live {\n"
+                "menuentry 'Debian GNU/Linux Live (amd64)' --id live --class debian {\n"
                 "    linux /live/vmlinuz boot=live\n"
                 "}\n",
                 encoding="utf-8",
@@ -38,6 +38,7 @@ class BootloaderBrandingTests(unittest.TestCase):
             self.assertIn("menu label ^Nacar GNU/Linux Live", isolinux.read_text())
             self.assertIn("set upstream_name=Debian", isolinux.read_text())
             self.assertIn("menuentry 'Nacar GNU/Linux Live (amd64)'", grub.read_text())
+            self.assertIn("--class debian", grub.read_text())
             self.assertIn("# Copyright Debian Live contributors", isolinux.read_text())
             self.assertIn("# Debian notice remains intact", grub.read_text())
             self.assertIn("Debian Live upstream copyright text", legal.read_text())
