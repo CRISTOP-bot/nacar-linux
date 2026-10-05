@@ -17,7 +17,8 @@ No test result is recorded until these steps run against a built image.
 4. Confirm intended OpenRC service scripts are enabled and no systemd init/service manager is required or running.
 5. Verify DHCP and DNS in an isolated QEMU user network; separately record hardware firmware limitations.
 6. Check shutdown/reboot and inspect console/kernel logs for failed units, service loops, and permission errors.
-7. Record QEMU/OVMF versions, exact command lines, image SHA-256, package inventory, and logs.
+7. Verify the per-boot Live password is visible only on the local console, allows the intended login/admin path, and does not appear in saved logs; repeat with and without persistence.
+8. Record QEMU/OVMF versions, exact command lines, image SHA-256, package inventory, and logs; redact the credential from any retained console capture.
 
 ## Safety
 

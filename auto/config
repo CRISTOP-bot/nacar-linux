@@ -14,6 +14,6 @@ lb config noauto \
     --mirror-bootstrap https://deb.debian.org/debian/ \
     --mirror-chroot https://deb.debian.org/debian/ \
     --mirror-binary https://deb.debian.org/debian/ \
-    --bootappend-live "boot=live init=/usr/sbin/openrc-init username=live" \
+    --bootappend-live "boot=live init=/usr/sbin/openrc-init username=live live-config.hooks=filesystem" \
     --memtest none \
     "$@"

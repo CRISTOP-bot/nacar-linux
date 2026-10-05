@@ -15,6 +15,8 @@ This roadmap is ordered by dependency and proof, not by visual polish. A milesto
 
 ## M1 — first bootable Live image
 
+A prototype per-boot credential hook and mocked failure/rollback tests exist; M1 remains incomplete until the hook is exercised in the actual image under OpenRC and the BIOS/UEFI matrix passes.
+
 - [ ] Build on a clean Debian Trixie amd64 host/container with explicitly recorded tool versions.
 - [ ] Resolve Live user credentials securely; do not publish the documented default Live password.
 - [ ] Boot in QEMU BIOS and UEFI; assert `/proc/1/comm`/executable identifies OpenRC init and `rc-status` works.

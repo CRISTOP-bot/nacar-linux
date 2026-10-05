@@ -12,6 +12,6 @@ jobs:
       - name: Check out source
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Check shell syntax
-        run: bash -n build.sh && sh -n auto/config
+        run: bash -n build.sh && sh -n auto/config && sh -n config/includes.chroot/usr/lib/live/config-hooks/9999-nacar-live-credentials
       - name: Run repository and policy tests
         run: python3 -m unittest discover -s tests -v

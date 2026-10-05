@@ -25,6 +25,8 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertIn("--distribution trixie", config)
         self.assertIn("--binary-images iso-hybrid", config)
         self.assertIn("init=/usr/sbin/openrc-init", config)
+        self.assertIn("live-config.hooks=filesystem", config)
+        self.assertTrue((ROOT / "config/includes.chroot/usr/lib/live/config-hooks/9999-nacar-live-credentials").is_file())
         self.assertIn("openrc", package_names)
         self.assertIn("live-boot", package_names)
         self.assertNotIn("systemd-sysv", package_names)

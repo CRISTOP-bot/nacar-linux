@@ -5,10 +5,11 @@
 ## Current status
 
 - **Implemented:** repository policy and documentation baseline; an amd64 Debian Trixie `live-build` configuration; a bootstrap script that builds in a fresh temporary directory, refuses to overwrite named output artifacts, and records a binary-package inventory and builder/source metadata with SHA-256 checksums.
-- **Not yet verified:** building the ISO, OpenRC as PID 1 via `openrc-init`, BIOS/UEFI boot, live networking, install flow, clean-room reproducibility, and the resulting image's exact package closure.
+- **Experimental, not boot-validated:** per-boot Live credential hook; its mocked tests cover console-only display and password restoration on failures.
+- **Not yet verified:** building the ISO, OpenRC as PID 1 via `openrc-init`, credential-hook order, BIOS/UEFI boot, live networking, install flow, clean-room reproducibility, and the resulting image's exact package closure.
 - **Not implemented:** installer, graphical desktop, `distroctl`, signed custom repository, release signing, or branded assets. A gated GitHub Actions workflow can build and publish a release only after explicit release approval.
 
-The initial image configuration is experimental. Do not distribute an ISO until the live-user credential policy and QEMU boot tests are complete; Debian Live's default live-user password must not silently become a public release default.
+The initial image configuration and per-boot console-password hook are experimental. The hook has mocked success/failure/rollback tests, but has not been validated in a built image. Do not distribute an ISO until its run order, console handoff, persistence behavior, and QEMU boot tests are complete; Debian Live's default password must not silently become a public release default.
 
 ## Principles
 

@@ -6,6 +6,8 @@ live-boot
 live-config
 live-config-sysvinit
 openrc
+passwd
+coreutils
 bash
 ca-certificates
 ifupdown
