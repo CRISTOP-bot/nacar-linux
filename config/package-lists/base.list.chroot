@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Purpose: minimum interactive Live image with Debian's OpenRC package and wired networking.
+# Each package must have a documented role; recommendations are disabled by auto/config.
+linux-image-amd64
+live-boot
+live-config
+live-config-sysvinit
+openrc
+bash
+ca-certificates
+ifupdown
+iproute2
+iputils-ping
+isc-dhcp-client
+procps
+util-linux

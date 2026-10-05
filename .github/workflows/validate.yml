@@ -1,0 +1,17 @@
+name: Validate repository
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Check shell syntax
+        run: bash -n build.sh && sh -n auto/config
+      - name: Run repository and policy tests
+        run: python3 -m unittest discover -s tests -v

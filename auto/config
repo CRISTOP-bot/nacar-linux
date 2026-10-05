@@ -1,0 +1,19 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+set -eu
+
+lb config noauto \
+    --distribution trixie \
+    --architectures amd64 \
+    --binary-images iso-hybrid \
+    --archive-areas main \
+    --apt-recommends false \
+    --debian-installer none \
+    --debootstrap-options "--variant=minbase" \
+    --linux-packages linux-image \
+    --mirror-bootstrap https://deb.debian.org/debian/ \
+    --mirror-chroot https://deb.debian.org/debian/ \
+    --mirror-binary https://deb.debian.org/debian/ \
+    --bootappend-live "boot=live init=/usr/sbin/openrc-init username=live" \
+    --memtest none \
+    "$@"

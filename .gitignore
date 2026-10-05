@@ -1,0 +1,45 @@
+# Generated live-build trees and temporary build output
+/build/*
+!/build/README.md
+/chroot/
+/binary/
+/cache/
+/config/bootloaders/
+/config/binary
+/config/bootstrap
+/config/chroot
+/config/common
+/config/source
+/dist/
+*.hybrid.iso
+*.iso
+*.img
+*.log
+*.packages.tsv
+*.sha256
+
+# Python and editor artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Secrets and signing material
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*.asc
+*.gpg
+*.kbx
+secrets/
+credentials/

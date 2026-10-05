@@ -1,0 +1,42 @@
+name: Build and publish release ISO
+on:
+  push:
+    tags:
+      - 'v*'
+permissions:
+  contents: write
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-24.04
+    container: debian:trixie-slim
+    timeout-minutes: 90
+    steps:
+      - name: Check out the tagged source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Enforce release gates
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          test "$(cat RELEASE_STATUS)" = release-ready || { echo 'Release blocked: complete documented release gates first.' >&2; exit 1; }
+          test "${RELEASE_TAG#v}" = "$(cat VERSION)" || { echo 'Release tag does not match VERSION.' >&2; exit 1; }
+      - name: Install Debian Live build dependencies
+        run: |
+          set -euo pipefail
+          apt-get update
+          apt-get install --yes --no-install-recommends \
+            ca-certificates dosfstools gh git live-build grub-efi-amd64-bin grub-pc-bin \
+            mtools qemu-utils rsync squashfs-tools syslinux-common syslinux-utils xorriso
+      - name: Build ISO, inventory, and checksums
+        run: ./build.sh
+      - name: Create the GitHub Release after successful build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" \
+            dist/openrc-debian_*.iso \
+            dist/openrc-debian_*.packages.tsv \
+            dist/openrc-debian_*.sha256 \
+            --title "$RELEASE_TAG" --generate-notes
