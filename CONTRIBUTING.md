@@ -1,13 +1,13 @@
 # Contributing
 
-Contributions should improve a real, testable part of the distribution. Small, reviewable pull requests are preferred; do not submit generated ISOs, caches, secrets, or large build trees.
+Contributions should improve a real, testable part of the distribution. Small, reviewable pull requests are preferred; do not submit generated ISOs, caches, secrets, or large build trees. Follow [`AGENTS.md`](AGENTS.md) for repository-specific invariants and [`docs/development-workflow.md`](docs/development-workflow.md) for the standard change and verification sequence.
 
 ## Before a pull request
 
 1. Explain the problem and the design choice; link an architecture decision when one is needed.
 2. Preserve existing behavior unless a documented technical reason justifies a change.
 3. For third-party material, establish provenance, version, copyright, and license before inclusion; update `THIRD_PARTY.md` and keep all required notices.
-4. Run `bash -n build.sh auto/config` and `python3 -m unittest discover -s tests -v`.
+4. Run the checks in `AGENTS.md`, including shell syntax checks, Python unit tests, and bytecode compilation.
 5. For build, package, init, or boot changes, report the exact Debian suite, tool versions, commands, and test results. Do not describe an untested configuration as working.
 6. Keep secrets and private signing material out of Git. Use test-only credentials and explain how to reproduce without publishing them.
 

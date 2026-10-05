@@ -5,13 +5,13 @@ This roadmap is ordered by dependency and proof, not by visual polish. A milesto
 ## M0 — repository foundation (in progress)
 
 - [x] Separate new work from unrelated existing OS repositories.
-- [x] Select Debian Trixie amd64 as the initial technical target; keep brand unselected.
+- [x] Select Debian Trixie amd64 as the initial technical target; the provisional Nácar working name is recorded separately under M5.
 - [x] Record the live-build/OpenRC design, licensing policy, third-party policy, security gates, and fork guidance.
 - [x] Add an isolated live-build bootstrap configuration, output checksums, and package inventory generation.
 - [x] Add shell syntax and Python structure/policy checks, including basic high-confidence secret patterns.
 - [x] Document the purpose and verification status of every explicitly selected base-image package.
-- [ ] Execute CI and build checks in an environment with Git and Debian Live tools installed.
-- [ ] Confirm available Debian package versions and verify `openrc-init` is usable as PID 1 in the chosen live system.
+- [x] Execute static CI validation and manual build attempts; the builds exposed unresolved Live/init package conflicts.
+- [ ] Resolve dependency conflicts, complete a successful image build, and verify `openrc-init` as PID 1 in the booted live system.
 
 ## M1 — first bootable Live image
 
@@ -21,7 +21,7 @@ A prototype per-boot credential hook and mocked failure/rollback tests exist; M1
 - [ ] Resolve Live user credentials securely; do not publish the documented default Live password.
 - [ ] Boot in QEMU BIOS and UEFI; assert `/proc/1/comm`/executable identifies OpenRC init and `rc-status` works.
 - [ ] Verify a shell, kernel, initramfs, storage visibility, DHCP/DNS, and no unintended service startup.
-- [ ] Save boot logs, image checksums, package inventory, and test commands as CI artifacts.
+- [ ] Record boot logs, checksums, package inventory, and exact test commands as reviewed evidence without exposing an unapproved experimental ISO.
 
 ## M2 — installer design and minimal installation
 

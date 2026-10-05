@@ -9,9 +9,10 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 class RepositoryPolicyTests(unittest.TestCase):
     def test_required_project_documents_exist(self):
         for name in (
-            "README.md", "ROADMAP.md", "VERSION", "LICENSE", "COPYRIGHT",
+            "README.md", "AGENTS.md", "ROADMAP.md", "VERSION", "LICENSE", "COPYRIGHT",
             "THIRD_PARTY.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md",
-            "SECURITY.md", "FORKING.md", "CHANGELOG.md", "docs/build-system.md",
+            "SECURITY.md", "FORKING.md", "CHANGELOG.md", "docs/README.md",
+            "docs/development-workflow.md", "docs/verification-model.md", "docs/build-system.md",
             "docs/architecture/package-rationale.md",
             "docs/architecture/decisions/0002-provisional-distribution-name.md",
             "tests/verify_live_image.sh",

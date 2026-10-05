@@ -6,7 +6,7 @@
 
 - **Implemented:** repository policy and documentation baseline; an amd64 Debian Trixie `live-build` configuration; a bootstrap script that builds in a fresh temporary directory, refuses to overwrite named output artifacts, and records a binary-package inventory and builder/source metadata with SHA-256 checksums.
 - **Experimental, not boot-validated:** per-boot Live credential hook; its mocked tests cover console-only display and password restoration on failures.
-- **Not yet verified:** building the ISO, OpenRC as PID 1 via `openrc-init`, credential-hook order, BIOS/UEFI boot, live networking, install flow, clean-room reproducibility, and the resulting image's exact package closure.
+- **Not yet verified:** a successful ISO build; OpenRC as PID 1 via `openrc-init`; runtime credential-hook behavior; BIOS/UEFI boot; live networking; install flow; clean-room reproducibility; and the resulting image's exact package closure.
 - **Not implemented:** installer, graphical desktop, `distroctl`, signed custom repository, release signing, or branded assets. A gated GitHub Actions workflow can build and publish a release only after explicit release approval.
 
 The initial image configuration and per-boot console-password hook are experimental. The hook has mocked success/failure/rollback tests, but has not been validated in a built image. Do not distribute an ISO until its run order, console handoff, persistence behavior, and QEMU boot tests are complete; Debian Live's default password must not silently become a public release default.
@@ -27,6 +27,8 @@ The initial image configuration and per-boot console-password hook are experimen
 - `system/openrc/` — OpenRC design notes and service policy.
 - `installer/`, `src/` — implementation boundaries; no placeholder executable is presented as a feature.
 - `configs/branding/`, `assets/branding/` — forkable identity layer; working name recorded, artwork and visual identity still unselected.
+- `AGENTS.md`, `docs/README.md` — repository-specific agent guidance and documentation index.
+- `docs/development-workflow.md`, `docs/verification-model.md` — development checks and evidence boundaries.
 - `docs/architecture/`, `docs/licensing/`, `docs/security/` — recorded decisions and release gates.
 - `third-party/`, `THIRD_PARTY.md` — third-party provenance and per-build binary inventory policy.
 - `tests/`, `.github/` — checks and contribution automation.
@@ -43,22 +45,27 @@ Run from a clean clone:
 
 The script checks prerequisites, configures a fresh temporary build tree, invokes Debian `live-build`, and writes the ISO, TSV package inventory, builder/source metadata, and checksums under `dist/`. It refuses to overwrite matching outputs. Build artifacts and caches are excluded from Git. `./build.sh --check` checks local prerequisites without building.
 
-The manual GitHub Actions build workflow creates `dist/nacar.iso` and checks package contents and branding. The workflow does not upload or retain the ISO, so making this repository public will not expose a build artifact; the runner discards the output at job end. This is an experimental build, not a release, and it does not boot-test the image. Debian remains the technical base: package notices, `/etc/debian_version`, Debian repository URLs, and `ID_LIKE=debian` are intentionally preserved; only user-facing product identity is rebranded. A `v*` tag triggers the separate release workflow, gated by `RELEASE_STATUS=release-ready` and a tag matching `VERSION`; the status remains `blocked`. See `ROADMAP.md`, `docs/build-system.md`, and `docs/architecture/decisions/0001-bootstrap-and-live-builder.md`.
+The manual GitHub Actions build workflow creates `dist/nacar.iso` and checks package contents and branding. The workflow does not upload or retain the ISO; the public runner discards its output at job end. This is an experimental build, not a release, and it does not boot-test the image. Debian remains the technical base: package notices, `/etc/debian_version`, Debian repository URLs, and `ID_LIKE=debian` are intentionally preserved; only user-facing product identity is rebranded. A `v*` tag triggers the separate release workflow, gated by `RELEASE_STATUS=release-ready` and a tag matching `VERSION`; the status remains `blocked`. See `ROADMAP.md`, `docs/build-system.md`, and `docs/architecture/decisions/0001-bootstrap-and-live-builder.md`.
 
 ## Development and tests
 
 Run the checks with the Python standard library and Bash:
 
 ```sh
-bash -n build.sh && sh -n auto/config
+bash -n build.sh
+sh -n auto/config
+sh -n config/includes.chroot/usr/lib/live/config-hooks/9999-nacar-live-credentials
+sh -n tests/verify_live_image.sh
+sh -n scripts/build_in_container.sh
 python3 -m unittest discover -s tests -v
+python3 -m py_compile scripts/*.py tests/*.py
 ```
 
 A passing static check does not establish that the ISO boots. QEMU BIOS and UEFI checks are release gates, documented in `docs/architecture/boot-test-plan.md`.
 
 ## Contributing and licenses
 
-Read `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md` before opening a contribution. Original project code is offered under GPL-3.0-or-later. Debian and other upstream works retain their own licenses and attribution; see `LICENSE`, `COPYRIGHT`, and `THIRD_PARTY.md`. Do not add copied third-party code before reviewing its exact source, version, copyright, and license and recording it in `THIRD_PARTY.md`.
+Read `AGENTS.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md` before changing or contributing to the repository; `docs/README.md` indexes the design and verification documents. Original project code is offered under GPL-3.0-or-later. Debian and other upstream works retain their own licenses and attribution; see `LICENSE`, `COPYRIGHT`, and `THIRD_PARTY.md`. Do not add copied third-party code before reviewing its exact source, version, copyright, and license and recording it in `THIRD_PARTY.md`.
 
 ## Forks and trademarks
 
