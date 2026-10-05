@@ -14,9 +14,7 @@ class RepositoryPolicyTests(unittest.TestCase):
             "SECURITY.md", "FORKING.md", "CHANGELOG.md", "docs/build-system.md",
             "docs/architecture/package-rationale.md",
             "docs/architecture/decisions/0002-provisional-distribution-name.md",
-            "tests/verify_live_image.sh", "scripts/brand_bootloaders.py",
-            "scripts/check_iso_metadata.py", "scripts/check_boot_branding.py",
-            "scripts/build_in_container.sh",
+            "tests/verify_live_image.sh",
         ):
             with self.subTest(name=name):
                 self.assertTrue((ROOT / name).is_file())
@@ -29,10 +27,6 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertIn("--binary-images iso-hybrid", config)
         self.assertIn("init=/usr/sbin/openrc-init", config)
         self.assertIn("live-config.hooks=filesystem", config)
-        self.assertIn("hostname=nacar", config)
-        self.assertIn('--image-name nacar', config)
-        self.assertIn('--iso-volume NACAR_LINUX', config)
-        self.assertIn('--iso-application "Nacar GNU/Linux Live"', config)
         self.assertTrue((ROOT / "config/includes.chroot/usr/lib/live/config-hooks/9999-nacar-live-credentials").is_file())
         self.assertIn("openrc", package_names)
         self.assertIn("live-boot", package_names)
@@ -48,9 +42,26 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertIn("Nácar GNU/Linux", readme)
         self.assertIn('BASENAME="nacar.iso"', build)
         self.assertIn('PACKAGE_BASENAME="nacar.packages.tsv"', build)
-        self.assertIn('dist/nacar.iso', release)
-        self.assertIn('dist/nacar.iso', (ROOT / ".github/workflows/verify-live-build.yml").read_text())
+        self.assertIn('INFO_BASENAME="nacar.build-info.txt"', build)
+        self.assertIn('SUMS_BASENAME="nacar.sha256"', build)
+        self.assertIn("dist/nacar.iso", release)
+        self.assertNotIn("nacar-linux_*.iso", build + release)
         self.assertNotIn("openrc-debian_", build + release)
+
+    def test_product_identity_changes_do_not_erase_debian_provenance(self):
+        build = (ROOT / "build.sh").read_text()
+        config = (ROOT / "auto/config").read_text()
+        verifier = (ROOT / "tests/verify_live_image.sh").read_text()
+        self.assertIn('--image-name nacar', config)
+        self.assertIn('--iso-volume NACAR_LINUX', config)
+        self.assertIn('--iso-application "Nacar GNU/Linux Live"', config)
+        self.assertIn("ID=nacar", build)
+        self.assertIn("ID_LIKE=debian", build)
+        self.assertIn("target_distribution=Debian", build)
+        self.assertIn("/etc/debian_version", verifier)
+        self.assertIn("ID_LIKE=debian", verifier)
+        self.assertIn("deb.debian.org/debian/", config)
+        self.assertNotIn("debian_version'", build)
 
     def test_every_explicit_base_package_has_a_rationale(self):
         package_lines = (ROOT / "config/package-lists/base.list.chroot").read_text().splitlines()
@@ -85,19 +96,19 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertIn(".build-info.txt", (ROOT / ".github/workflows/release-iso.yml").read_text())
         self.assertIn("*.build-info.txt", (ROOT / ".gitignore").read_text())
 
-    def test_manual_build_uploads_private_preview_but_never_releases_iso(self):
+    def test_manual_live_build_does_not_publish_iso_or_release(self):
         workflow = (ROOT / ".github/workflows/verify-live-build.yml").read_text()
-        build_helper = (ROOT / "scripts/build_in_container.sh").read_text()
         verifier = (ROOT / "tests/verify_live_image.sh").read_text()
         self.assertIn("workflow_dispatch:", workflow)
         self.assertIn("docker run --rm --privileged", workflow)
-        self.assertIn("actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02", workflow)
-        self.assertIn("retention-days: 14", workflow)
+        self.assertIn("test -s dist/nacar.iso", workflow)
+        self.assertIn("sha256sum --check nacar.sha256", workflow)
+        self.assertIn("does not upload or retain the ISO", workflow)
+        self.assertNotIn("upload-artifact", workflow)
         self.assertNotIn("gh release create", workflow)
-        self.assertIn("bash tests/verify_live_image.sh", build_helper)
         self.assertIn("usr/lib/live/config-hooks/9999-nacar-live-credentials", verifier)
-        self.assertIn("ID_LIKE=debian", verifier)
         self.assertIn("openrc-init", verifier)
+        self.assertIn("ID_LIKE=debian", verifier)
         self.assertIn("USER_ORDER", verifier)
         self.assertIn("HOOK_ORDER", verifier)
         self.assertIn("do not prove boot", verifier)

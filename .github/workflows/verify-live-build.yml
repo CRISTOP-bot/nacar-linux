@@ -19,18 +19,11 @@ jobs:
             --env GITHUB_SHA --env GITHUB_REF_NAME \
             debian:trixie-slim \
             bash scripts/build_in_container.sh
-      - name: Upload private preview artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: nacar-iso-${{ github.sha }}
-          path: |
-            dist/nacar.iso
-            dist/nacar.packages.tsv
-            dist/nacar.build-info.txt
-            dist/nacar.sha256
-          if-no-files-found: error
-          retention-days: 14
-      - name: Summarize verification limits
+      - name: Verify output checksums and summarize limits
         run: |
-          printf '%s\n' 'The ISO is available only as a private, temporary workflow artifact.'
-          printf '%s\n' 'This build does not boot-test the image; RELEASE_STATUS remains blocked.'
+          set -euo pipefail
+          test -s dist/nacar.iso
+          (cd dist && sha256sum --check nacar.sha256)
+          printf '%s\n' 'Nácar ISO built and inspected; this public workflow does not upload or retain the ISO.'
+          printf '%s\n' 'The runner discards its workspace at job end; this does not boot-test the image.'
+          printf '%s\n' 'RELEASE_STATUS remains blocked.'

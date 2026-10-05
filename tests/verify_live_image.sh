@@ -32,6 +32,7 @@ ROOTFS="$TMPDIR_VERIFY/rootfs"
 grep -Fqx 'ID=nacar' "$ROOTFS/etc/os-release"
 grep -Fqx 'ID_LIKE=debian' "$ROOTFS/etc/os-release"
 grep -Fq 'Nácar GNU/Linux' "$ROOTFS/etc/os-release"
+[ -s "$ROOTFS/etc/debian_version" ] || { printf '%s\n' 'Debian technical version metadata is missing.' >&2; exit 1; }
 grep -Fq 'Nácar GNU/Linux' "$ROOTFS/etc/issue"
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)"
 python3 "$SCRIPT_DIR/../scripts/check_iso_metadata.py" "$ISO"

@@ -1,6 +1,6 @@
 # Nácar GNU/Linux
 
-**Nácar GNU/Linux** is the working name for a small distribution based on Debian and built around OpenRC. Its GitHub slug is `nacar-linux`; the requested ISO filename is `nacar.iso`. This repository is an early engineering baseline, **not a released or production-ready operating system**. The name is provisional pending trademark review; no logo or visual identity has been selected.
+**Nácar GNU/Linux** is the working name for a small, Debian-first distribution built around OpenRC. Its GitHub repository slug is `nacar-linux`; the ISO file is named `nacar.iso`. This repository is an early engineering baseline, **not a released or production-ready operating system**. The name is provisional pending trademark review; no logo or graphical visual identity has been selected. Build-time textual branding is isolated from upstream templates and preserves required Debian notices and technical provenance.
 
 ## Current status
 
@@ -41,9 +41,9 @@ Run from a clean clone:
 ./build.sh
 ```
 
-The script checks prerequisites, configures a fresh temporary build tree, invokes `live-build`, brands the user-visible boot and session identity as Nácar, and writes `dist/nacar.iso` plus the package inventory, build metadata, and checksums. It refuses to overwrite existing outputs. Build artifacts and caches are excluded from Git. `./build.sh --check` checks local prerequisites without building.
+The script checks prerequisites, configures a fresh temporary build tree, invokes Debian `live-build`, and writes the ISO, TSV package inventory, builder/source metadata, and checksums under `dist/`. It refuses to overwrite matching outputs. Build artifacts and caches are excluded from Git. `./build.sh --check` checks local prerequisites without building.
 
-No successful ISO build or boot test is recorded yet. The manual GitHub Actions workflow builds in a temporary privileged Debian Trixie container, checks the user-visible Nácar boot/ISO/session branding plus the package set and credential hook, and uploads a private preview artifact for 14 days; it does not create a release or prove boot. A `v*` tag triggers the separate release workflow, gated by `RELEASE_STATUS=release-ready` and a tag matching `VERSION`; the status remains `blocked`. See `ROADMAP.md`, `docs/build-system.md`, and `docs/architecture/decisions/0001-bootstrap-and-live-builder.md`.
+The manual GitHub Actions build workflow creates `dist/nacar.iso` and checks package contents and branding. The workflow does not upload or retain the ISO, so making this repository public will not expose a build artifact; the runner discards the output at job end. This is an experimental build, not a release, and it does not boot-test the image. Debian remains the technical base: package notices, `/etc/debian_version`, Debian repository URLs, and `ID_LIKE=debian` are intentionally preserved; only user-facing product identity is rebranded. A `v*` tag triggers the separate release workflow, gated by `RELEASE_STATUS=release-ready` and a tag matching `VERSION`; the status remains `blocked`. See `ROADMAP.md`, `docs/build-system.md`, and `docs/architecture/decisions/0001-bootstrap-and-live-builder.md`.
 
 ## Development and tests
 
