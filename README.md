@@ -4,7 +4,7 @@ A small, Debian-first foundation for developing an installable GNU/Linux distrib
 
 ## Current status
 
-- **Implemented:** repository policy and documentation baseline; an amd64 Debian Trixie `live-build` configuration; a bootstrap script that builds in a fresh temporary directory, refuses to overwrite named output artifacts, and records a binary-package inventory with SHA-256 checksums.
+- **Implemented:** repository policy and documentation baseline; an amd64 Debian Trixie `live-build` configuration; a bootstrap script that builds in a fresh temporary directory, refuses to overwrite named output artifacts, and records a binary-package inventory and builder/source metadata with SHA-256 checksums.
 - **Not yet verified:** building the ISO, OpenRC as PID 1 via `openrc-init`, BIOS/UEFI boot, live networking, install flow, clean-room reproducibility, and the resulting image's exact package closure.
 - **Not implemented:** installer, graphical desktop, `distroctl`, signed custom repository, release signing, or branded assets. A gated GitHub Actions workflow can build and publish a release only after explicit release approval.
 
@@ -40,7 +40,7 @@ Run from a clean clone:
 ./build.sh
 ```
 
-The script checks prerequisites, configures a fresh temporary build tree, invokes Debian `live-build`, and writes the ISO, a TSV package inventory, and checksums under `dist/`. It will refuse to overwrite matching outputs. Build artifacts and caches are excluded from Git. `./build.sh --check` checks local prerequisites without building.
+The script checks prerequisites, configures a fresh temporary build tree, invokes Debian `live-build`, and writes the ISO, TSV package inventory, builder/source metadata, and checksums under `dist/`. It refuses to overwrite matching outputs. Build artifacts and caches are excluded from Git. `./build.sh --check` checks local prerequisites without building.
 
 The current environment used to prepare this baseline had no Git, `live-build`, `xorriso`, `debootstrap`, or QEMU. Consequently, no ISO has been built or boot-tested here. GitHub Actions runs shell and policy checks; a `v*` tag triggers a release build, and only a successful build can create a GitHub Release. That workflow remains gated on `RELEASE_STATUS=release-ready` and a tag matching `VERSION`; the status currently remains `blocked`. See `ROADMAP.md` for the next gates and `docs/architecture/decisions/0001-bootstrap-and-live-builder.md` for the design rationale.
 

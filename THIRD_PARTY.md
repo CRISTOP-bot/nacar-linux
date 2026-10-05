@@ -7,7 +7,7 @@ No third-party source code, binary package, logo, font, or artwork is vendored i
 | Component | Version | Origin | License / copyright | Modifications | Project location / use |
 | --- | --- | --- | --- | --- | --- |
 | Debian GNU/Linux archive packages | Exact versions are resolved at build time; see the generated `*.packages.tsv` next to each ISO | Debian archive selected by `auto/config` | Per-package copyright and licensing are supplied in the installed package's `/usr/share/doc/<package>/copyright`; see Debian's package metadata | None to upstream package sources in this repository | Installed into the generated live filesystem; requested package names are listed in `config/package-lists/base.list.chroot` |
-| `live-build` | Host version is not pinned yet; record it with each future release | Debian archive on the build host | Debian package copyright file `/usr/share/doc/live-build/copyright`; Debian Live manual is GPL-3-or-later | No upstream source changes; project-specific options live in `auto/config` | Build-time only |
+| `live-build` | Exact version is recorded per image in its `.build-info.txt`; not pinned as a build input yet | Debian archive on the build host | Debian package copyright file `/usr/share/doc/live-build/copyright`; Debian Live manual is GPL-3-or-later | No upstream source changes; project-specific options live in `auto/config` | Build-time only |
 | OpenRC | Binary version resolved from Debian archive at build time; exact version appears in the generated package inventory | Debian archive; upstream project is OpenRC | Package copyright is in `/usr/share/doc/openrc/copyright` inside the image; Debian packaging may contain additional notices | No upstream source changes; PID 1 selection is configured as a kernel boot argument and remains to be boot-verified | Requested in the live filesystem through the base package list |
 | `actions/checkout` | v4.2.2, pinned to commit `11bd71901bbe5b1630ceea73d27597364c9af683` | `https://github.com/actions/checkout` | MIT License per upstream repository | Not modified | GitHub Actions workflows only; not included in the distribution image |
 
@@ -15,7 +15,7 @@ This table is a build policy, not a substitute for the actual release inventory.
 
 ## Per-build inventory
 
-`build.sh` writes a tab-separated package/version/source inventory and a SHA-256 file beside the ISO. These artifacts are generated locally and ignored by Git. They record the binary package set; they are not a complete license scan and do not replace upstream copyright files or required source distribution.
+`build.sh` writes a tab-separated package/version/source inventory, a build-information file (target, source ref/revision when supplied, host distribution, kernel, `live-build` version, timestamps, and reproducibility status), and a SHA-256 file beside the ISO. These artifacts are generated locally and ignored by Git. They record the binary package set and builder context; they are not a complete license scan and do not replace upstream copyright files or required source distribution.
 
 ## Before adding a dependency
 

@@ -46,11 +46,20 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertIn("/dist/", ignore)
         self.assertIn("/build/", ignore)
         self.assertIn("*.iso", ignore)
+        self.assertIn("*.build-info.txt", ignore)
 
     def test_build_protects_existing_artifacts(self):
         script = (ROOT / "build.sh").read_text()
         self.assertIn("Refusing to overwrite existing output", script)
         self.assertIn("mktemp -d", script)
+
+    def test_build_metadata_records_provenance_without_claiming_reproducibility(self):
+        script = (ROOT / "build.sh").read_text()
+        for field in ("source_revision", "builder_distribution", "live_build_version", "reproducibility_status=not-established"):
+            with self.subTest(field=field):
+                self.assertIn(field, script)
+        self.assertIn(".build-info.txt", (ROOT / ".github/workflows/release-iso.yml").read_text())
+        self.assertIn("*.build-info.txt", (ROOT / ".gitignore").read_text())
 
     def test_release_workflow_is_blocked_until_review(self):
         self.assertEqual((ROOT / "RELEASE_STATUS").read_text().strip(), "blocked")

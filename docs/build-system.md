@@ -4,7 +4,7 @@ The initial image uses Debian's `live-build`; the project does not maintain its 
 
 ## Local command
 
-From the repository root, run `./build.sh`. It checks required host tools, creates a new temporary work directory, copies the build configuration into it, and invokes `live-build`. The root-only build step is run through `sudo` when needed. It then collects the binary package/version/source inventory, copies the ISO and inventory into `dist/`, and writes SHA-256 checksums. It refuses to overwrite artifacts with the same version.
+From the repository root, run `./build.sh`. It checks required host tools, creates a new temporary work directory, copies the build configuration into it, and invokes `live-build`. The root-only build step is run through `sudo` when needed. It then collects the binary package/version/source inventory, writes builder/source metadata, copies these files and the ISO into `dist/`, and writes SHA-256 checksums covering the ISO, inventory, and metadata. It refuses to overwrite artifacts with the same version. The metadata improves traceability but is not a reproducibility proof.
 
 The work directory is created by `mktemp` for that invocation only and removed at exit. Build caches and ISO outputs must not be committed. The repository's `.gitignore` excludes `/build/`, `/dist/`, live-build trees, images, logs, inventories, and checksums. Keep project documentation under `docs/`, not under generated-output paths.
 

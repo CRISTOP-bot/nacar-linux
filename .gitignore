@@ -15,6 +15,7 @@
 *.img
 *.log
 *.packages.tsv
+*.build-info.txt
 *.sha256
 
 # Python and editor artifacts
