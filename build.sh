@@ -14,7 +14,7 @@ usage() {
     cat <<'USAGE'
 Usage: ./build.sh [--check|--help]
 
-Build an amd64 Debian Trixie Live ISO with OpenRC requested as PID 1.
+Build the amd64 Nácar GNU/Linux Live ISO with OpenRC requested as PID 1.
 The build uses new temporary directories and will not overwrite files in dist/.
 
   --check   Check host build prerequisites only; do not build.
@@ -34,7 +34,7 @@ need() {
 
 check_prerequisites() {
     local failed=0
-    for tool in lb sha256sum dpkg-query find mktemp cp sort chroot head mkdir basename mv rm date; do
+    for tool in lb sha256sum dpkg-query find mktemp cp sort chroot head mkdir basename mv rm date python3; do
         need "$tool" || failed=1
     done
     if (( EUID != 0 )); then
@@ -42,6 +42,10 @@ check_prerequisites() {
     fi
     if (( failed )); then
         printf '%s\n' 'Install Debian live-build and its documented image-building dependencies, then retry.' >&2
+        return 1
+    fi
+    if [[ ! -d /usr/share/live/build/bootloaders ]]; then
+        printf '%s\n' 'Missing live-build bootloader templates at /usr/share/live/build/bootloaders.' >&2
         return 1
     fi
     printf 'live-build: %s\n' "$(lb --version 2>&1 | head -n 1)"
@@ -57,10 +61,10 @@ esac
 
 check_prerequisites
 OUT="$ROOT/dist"
-BASENAME="nacar-linux_${VERSION}_amd64.iso"
-PACKAGE_BASENAME="nacar-linux_${VERSION}_amd64.packages.tsv"
-INFO_BASENAME="nacar-linux_${VERSION}_amd64.build-info.txt"
-SUMS_BASENAME="nacar-linux_${VERSION}_amd64.sha256"
+BASENAME="nacar.iso"
+PACKAGE_BASENAME="nacar.packages.tsv"
+INFO_BASENAME="nacar.build-info.txt"
+SUMS_BASENAME="nacar.sha256"
 for name in "$BASENAME" "$PACKAGE_BASENAME" "$INFO_BASENAME" "$SUMS_BASENAME"; do
     if [[ -e "$OUT/$name" || -L "$OUT/$name" ]]; then
         printf 'Refusing to overwrite existing output: %s\n' "$OUT/$name" >&2
@@ -95,8 +99,32 @@ trap 'exit 143' TERM
 WORKDIR="$(mktemp -d "${TMPDIR:-/tmp}/debian-openrc-build.XXXXXXXX")"
 STAGING="$(mktemp -d "$ROOT/build/output.XXXXXXXX")"
 cp -a -- "$ROOT/auto" "$ROOT/config" "$WORKDIR/"
+BOOTLOADER_DEFAULTS=/usr/share/live/build/bootloaders
+if [[ ! -d "$BOOTLOADER_DEFAULTS" ]]; then
+    printf 'Missing live-build bootloader templates: %s\n' "$BOOTLOADER_DEFAULTS" >&2
+    exit 1
+fi
+if [[ -e "$WORKDIR/config/bootloaders" ]]; then
+    printf '%s\n' 'A repository bootloader override exists; merge it with upstream templates explicitly.' >&2
+    exit 1
+fi
+cp -a -- "$BOOTLOADER_DEFAULTS" "$WORKDIR/config/bootloaders"
+python3 "$ROOT/scripts/brand_bootloaders.py" "$WORKDIR/config/bootloaders"
+
+INCLUDES_ETC="$WORKDIR/config/includes.chroot/etc"
+mkdir -p -- "$INCLUDES_ETC"
+cat > "$INCLUDES_ETC/os-release" <<EOF
+NAME="Nácar GNU/Linux"
+PRETTY_NAME="Nácar GNU/Linux ${VERSION}"
+ID=nacar
+ID_LIKE=debian
+VERSION_ID="${VERSION}"
+EOF
+printf 'Nácar GNU/Linux %s\\n' "$VERSION" > "$INCLUDES_ETC/issue"
+printf 'Nácar GNU/Linux %s\\n' "$VERSION" > "$INCLUDES_ETC/issue.net"
+
 cd -- "$WORKDIR"
-printf '%s\n' 'Configuring Debian Live build...'
+printf '%s\n' 'Configuring Nacar image...'
 lb config
 printf '%s\n' 'Building the image; live-build needs elevated privileges...'
 if (( EUID == 0 )); then

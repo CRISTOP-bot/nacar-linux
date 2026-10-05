@@ -14,7 +14,9 @@ class RepositoryPolicyTests(unittest.TestCase):
             "SECURITY.md", "FORKING.md", "CHANGELOG.md", "docs/build-system.md",
             "docs/architecture/package-rationale.md",
             "docs/architecture/decisions/0002-provisional-distribution-name.md",
-            "tests/verify_live_image.sh",
+            "tests/verify_live_image.sh", "scripts/brand_bootloaders.py",
+            "scripts/check_iso_metadata.py", "scripts/check_boot_branding.py",
+            "scripts/build_in_container.sh",
         ):
             with self.subTest(name=name):
                 self.assertTrue((ROOT / name).is_file())
@@ -27,6 +29,10 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertIn("--binary-images iso-hybrid", config)
         self.assertIn("init=/usr/sbin/openrc-init", config)
         self.assertIn("live-config.hooks=filesystem", config)
+        self.assertIn("hostname=nacar", config)
+        self.assertIn('--image-name nacar', config)
+        self.assertIn('--iso-volume NACAR_LINUX', config)
+        self.assertIn('--iso-application "Nacar GNU/Linux Live"', config)
         self.assertTrue((ROOT / "config/includes.chroot/usr/lib/live/config-hooks/9999-nacar-live-credentials").is_file())
         self.assertIn("openrc", package_names)
         self.assertIn("live-boot", package_names)
@@ -40,8 +46,10 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertIn("Nácar GNU/Linux", name_decision)
         self.assertIn("nacar-linux", name_decision)
         self.assertIn("Nácar GNU/Linux", readme)
-        self.assertIn('BASENAME="nacar-linux_', build)
-        self.assertIn("dist/nacar-linux_*.iso", release)
+        self.assertIn('BASENAME="nacar.iso"', build)
+        self.assertIn('PACKAGE_BASENAME="nacar.packages.tsv"', build)
+        self.assertIn('dist/nacar.iso', release)
+        self.assertIn('dist/nacar.iso', (ROOT / ".github/workflows/verify-live-build.yml").read_text())
         self.assertNotIn("openrc-debian_", build + release)
 
     def test_every_explicit_base_package_has_a_rationale(self):
@@ -77,20 +85,22 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertIn(".build-info.txt", (ROOT / ".github/workflows/release-iso.yml").read_text())
         self.assertIn("*.build-info.txt", (ROOT / ".gitignore").read_text())
 
-    def test_manual_live_build_verifier_never_releases_or_uploads_iso(self):
+    def test_manual_build_uploads_private_preview_but_never_releases_iso(self):
         workflow = (ROOT / ".github/workflows/verify-live-build.yml").read_text()
+        build_helper = (ROOT / "scripts/build_in_container.sh").read_text()
         verifier = (ROOT / "tests/verify_live_image.sh").read_text()
         self.assertIn("workflow_dispatch:", workflow)
-        self.assertIn("options: --cap-add SYS_ADMIN", workflow)
-        self.assertIn("Verify chroot mount capability", workflow)
-        self.assertIn("bash tests/verify_live_image.sh", workflow)
+        self.assertIn("docker run --rm --privileged", workflow)
+        self.assertIn("actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02", workflow)
+        self.assertIn("retention-days: 14", workflow)
         self.assertNotIn("gh release create", workflow)
-        self.assertNotIn("upload-artifact", workflow)
+        self.assertIn("bash tests/verify_live_image.sh", build_helper)
         self.assertIn("usr/lib/live/config-hooks/9999-nacar-live-credentials", verifier)
+        self.assertIn("ID_LIKE=debian", verifier)
         self.assertIn("openrc-init", verifier)
         self.assertIn("USER_ORDER", verifier)
         self.assertIn("HOOK_ORDER", verifier)
-        self.assertIn("does not prove boot", verifier)
+        self.assertIn("do not prove boot", verifier)
 
     def test_release_workflow_is_blocked_until_review(self):
         self.assertEqual((ROOT / "RELEASE_STATUS").read_text().strip(), "blocked")

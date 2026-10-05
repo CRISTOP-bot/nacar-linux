@@ -11,7 +11,7 @@ ISO=$1
 PACKAGES=$2
 [ -f "$ISO" ] || { printf 'ISO not found: %s\n' "$ISO" >&2; exit 1; }
 [ -f "$PACKAGES" ] || { printf 'Package inventory not found: %s\n' "$PACKAGES" >&2; exit 1; }
-for tool in xorriso unsquashfs awk; do
+for tool in xorriso unsquashfs awk python3; do
     command -v "$tool" >/dev/null 2>&1 || { printf 'Missing verifier tool: %s\n' "$tool" >&2; exit 1; }
 done
 
@@ -29,6 +29,12 @@ trap cleanup EXIT HUP INT TERM
 xorriso -osirrox on -indev "$ISO" -extract /live/filesystem.squashfs "$TMPDIR_VERIFY/filesystem.squashfs" >/dev/null 2>&1
 unsquashfs -no-progress -d "$TMPDIR_VERIFY/rootfs" "$TMPDIR_VERIFY/filesystem.squashfs" >/dev/null
 ROOTFS="$TMPDIR_VERIFY/rootfs"
+grep -Fqx 'ID=nacar' "$ROOTFS/etc/os-release"
+grep -Fqx 'ID_LIKE=debian' "$ROOTFS/etc/os-release"
+grep -Fq 'Nácar GNU/Linux' "$ROOTFS/etc/os-release"
+grep -Fq 'Nácar GNU/Linux' "$ROOTFS/etc/issue"
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)"
+python3 "$SCRIPT_DIR/../scripts/check_iso_metadata.py" "$ISO"
 for file in \
     usr/sbin/openrc-init \
     usr/sbin/chpasswd \
@@ -39,6 +45,9 @@ for file in \
     usr/lib/live/config-hooks/9999-nacar-live-credentials; do
     [ -x "$ROOTFS/$file" ] || { printf 'Missing or non-executable image file: /%s\n' "$file" >&2; exit 1; }
 done
+xorriso -osirrox on -indev "$ISO" -extract /isolinux "$TMPDIR_VERIFY/isolinux" >/dev/null 2>&1
+xorriso -osirrox on -indev "$ISO" -extract /boot/grub "$TMPDIR_VERIFY/grub" >/dev/null 2>&1
+python3 "$SCRIPT_DIR/../scripts/check_boot_branding.py" "$TMPDIR_VERIFY/isolinux" "$TMPDIR_VERIFY/grub"
 
 # live-config components run in numeric filename order; the user's account
 # must exist before the custom filesystem hook is executed by the hooks component.
@@ -61,5 +70,5 @@ if [ "$USER_ORDER" -ge "$HOOK_ORDER" ]; then
     exit 1
 fi
 printf 'live-config order verified: %s precedes %s.\n' "${USER_SETUP##*/}" "${HOOK_RUNNER##*/}"
-printf '%s\n' 'ISO package inventory, OpenRC init, credential tools, and executable hook verified.'
-printf '%s\n' 'This check does not prove boot, PID 1, network, or hook order.'
+printf '%s\n' 'Nacar ISO branding, package inventory, OpenRC init, credential tools, and hook files verified.'
+printf '%s\n' 'These checks do not prove boot, PID 1, networking, or runtime hook execution.'

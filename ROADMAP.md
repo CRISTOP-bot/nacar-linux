@@ -46,7 +46,7 @@ A prototype per-boot credential hook and mocked failure/rollback tests exist; M1
 
 ## M5 — distribution identity, packages, and releases
 
-- [x] Choose Nácar GNU/Linux as a provisional working name and `nacar-linux` as the repository/artifact slug; document the limited name search.
+- [x] Choose Nácar GNU/Linux as a provisional working name, `nacar-linux` as the repository slug, and `nacar.iso` as the ISO filename; document the limited name search.
 - [ ] Complete trademark review, choose official artwork/branding, and designate maintainers.
 - [ ] Introduce custom packages/repository only for real project-owned functionality, with repository signing and key-rotation design.
 - [ ] Define `distroctl` scope only after Debian-native tools and OpenRC commands are evaluated.

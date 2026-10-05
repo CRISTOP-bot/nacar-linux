@@ -1,4 +1,4 @@
-name: Manual Live image build verification
+name: Build and inspect Nácar ISO (manual)
 on:
   workflow_dispatch:
 permissions:
@@ -6,41 +6,31 @@ permissions:
 jobs:
   build-and-inspect:
     runs-on: ubuntu-24.04
-    container:
-      image: debian:trixie-slim
-      # live-build must mount /proc and /dev/pts inside its chroot.
-      options: --cap-add SYS_ADMIN
     timeout-minutes: 120
     steps:
       - name: Check out source
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Install Debian Live builder and verifier tools
+      - name: Build and inspect in an isolated Debian Trixie container
         run: |
           set -euo pipefail
-          apt-get update
-          apt-get install --yes --no-install-recommends \
-            bash ca-certificates dosfstools grub-efi-amd64-bin grub-pc-bin \
-            live-build mtools rsync squashfs-tools syslinux-common \
-            syslinux-utils util-linux xorriso
-      - name: Verify chroot mount capability
+          docker run --rm --privileged \
+            --volume "$GITHUB_WORKSPACE:/workspace" \
+            --workdir /workspace \
+            --env GITHUB_SHA --env GITHUB_REF_NAME \
+            debian:trixie-slim \
+            bash scripts/build_in_container.sh
+      - name: Upload private preview artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: nacar-iso-${{ github.sha }}
+          path: |
+            dist/nacar.iso
+            dist/nacar.packages.tsv
+            dist/nacar.build-info.txt
+            dist/nacar.sha256
+          if-no-files-found: error
+          retention-days: 14
+      - name: Summarize verification limits
         run: |
-          set -euo pipefail
-          probe="$(mktemp -d)"
-          trap 'umount "$probe" 2>/dev/null || true; rmdir "$probe"' EXIT
-          mount -t tmpfs tmpfs "$probe"
-          umount "$probe"
-      - name: Build the experimental ISO
-        run: ./build.sh
-      - name: Verify checksums and packaged boot/credential files
-        run: |
-          set -euo pipefail
-          checksum_file="$(find dist -maxdepth 1 -type f -name 'nacar-linux_*.sha256' -print -quit)"
-          inventory="$(find dist -maxdepth 1 -type f -name 'nacar-linux_*.packages.tsv' -print -quit)"
-          iso="$(find dist -maxdepth 1 -type f -name 'nacar-linux_*.iso' -print -quit)"
-          test -n "$checksum_file" -a -n "$inventory" -a -n "$iso"
-          (cd dist && sha256sum --check "$(basename "$checksum_file")")
-          bash tests/verify_live_image.sh "$iso" "$inventory"
-      - name: Summarize release gate
-        run: |
-          printf '%s\n' 'This manual job does not publish or upload the ISO.'
-          printf '%s\n' 'A successful build is not a boot test; RELEASE_STATUS must remain blocked until QEMU gates pass.'
+          printf '%s\n' 'The ISO is available only as a private, temporary workflow artifact.'
+          printf '%s\n' 'This build does not boot-test the image; RELEASE_STATUS remains blocked.'

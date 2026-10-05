@@ -5,7 +5,7 @@
 
 ## Decision
 
-Use **Nácar GNU/Linux** as the working distribution name and `nacar-linux` as its ASCII GitHub repository and artifact slug. The name evokes a lightweight, layered system; no logo, custom artwork, or final visual identity is selected.
+Use **Nácar GNU/Linux** as the working distribution name, `nacar-linux` as the ASCII GitHub repository slug, and `nacar.iso` as the ISO filename. The name evokes a lightweight, layered system; no logo, custom artwork, or final visual identity is selected.
 
 A quick public web search and GitHub's public repository search for this exact name returned no results at the time of the check. This is not a complete trademark, company-name, domain, or legal search and does not establish that the name is available. Recheck before a public launch, and choose another name if a conflict is found.
 
@@ -15,6 +15,6 @@ Nácar is an independent project based on Debian; the name does not imply that i
 
 ## Consequences
 
-- Use the display name `Nácar GNU/Linux` in project documentation and `nacar-linux` in repository and artifact filenames.
+- Use `Nácar GNU/Linux` for display, `nacar-linux` for the GitHub repository slug, and `nacar.iso` for the image; sidecars use the `nacar.*` prefix.
 - Keep artwork, logo, colors, and boot theme out until their origin and licenses are reviewed.
 - Keep the ISO release blocked until the documented boot, credential, licensing, and release gates pass.

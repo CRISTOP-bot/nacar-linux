@@ -10,10 +10,15 @@ lb config noauto \
     --apt-recommends false \
     --debian-installer none \
     --debootstrap-options "--variant=minbase" \
+    --image-name nacar \
+    --iso-application "Nacar GNU/Linux Live" \
+    --iso-preparer "Nacar GNU/Linux build" \
+    --iso-publisher "Nacar GNU/Linux Project" \
+    --iso-volume NACAR_LINUX \
     --linux-packages linux-image \
     --mirror-bootstrap https://deb.debian.org/debian/ \
     --mirror-chroot https://deb.debian.org/debian/ \
     --mirror-binary https://deb.debian.org/debian/ \
-    --bootappend-live "boot=live init=/usr/sbin/openrc-init username=live live-config.hooks=filesystem" \
+    --bootappend-live "boot=live init=/usr/sbin/openrc-init hostname=nacar username=live live-config.hooks=filesystem" \
     --memtest none \
     "$@"
