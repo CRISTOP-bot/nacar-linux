@@ -9,6 +9,7 @@ This roadmap is ordered by dependency and proof, not by visual polish. A milesto
 - [x] Record the live-build/OpenRC design, licensing policy, third-party policy, security gates, and fork guidance.
 - [x] Add an isolated live-build bootstrap configuration, output checksums, and package inventory generation.
 - [x] Add shell syntax and Python structure/policy checks, including basic high-confidence secret patterns.
+- [x] Document the purpose and verification status of every explicitly selected base-image package.
 - [ ] Execute CI and build checks in an environment with Git and Debian Live tools installed.
 - [ ] Confirm available Debian package versions and verify `openrc-init` is usable as PID 1 in the chosen live system.
 

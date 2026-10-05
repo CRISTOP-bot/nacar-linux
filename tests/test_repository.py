@@ -12,6 +12,7 @@ class RepositoryPolicyTests(unittest.TestCase):
             "README.md", "ROADMAP.md", "VERSION", "LICENSE", "COPYRIGHT",
             "THIRD_PARTY.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md",
             "SECURITY.md", "FORKING.md", "CHANGELOG.md", "docs/build-system.md",
+            "docs/architecture/package-rationale.md",
         ):
             with self.subTest(name=name):
                 self.assertTrue((ROOT / name).is_file())
@@ -26,6 +27,14 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertIn("openrc", package_names)
         self.assertIn("live-boot", package_names)
         self.assertNotIn("systemd-sysv", package_names)
+
+    def test_every_explicit_base_package_has_a_rationale(self):
+        package_lines = (ROOT / "config/package-lists/base.list.chroot").read_text().splitlines()
+        packages = [line.strip() for line in package_lines if line.strip() and not line.lstrip().startswith("#")]
+        rationale = (ROOT / "docs/architecture/package-rationale.md").read_text()
+        for package in packages:
+            with self.subTest(package=package):
+                self.assertIn(f"| `{package}` |", rationale)
 
     def test_no_placeholder_or_remote_shell_bootstrap(self):
         for rel in ("build.sh", "auto/config"):
