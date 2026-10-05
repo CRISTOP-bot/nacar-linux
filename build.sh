@@ -57,10 +57,10 @@ esac
 
 check_prerequisites
 OUT="$ROOT/dist"
-BASENAME="openrc-debian_${VERSION}_amd64.iso"
-PACKAGE_BASENAME="openrc-debian_${VERSION}_amd64.packages.tsv"
-INFO_BASENAME="openrc-debian_${VERSION}_amd64.build-info.txt"
-SUMS_BASENAME="openrc-debian_${VERSION}_amd64.sha256"
+BASENAME="nacar-linux_${VERSION}_amd64.iso"
+PACKAGE_BASENAME="nacar-linux_${VERSION}_amd64.packages.tsv"
+INFO_BASENAME="nacar-linux_${VERSION}_amd64.build-info.txt"
+SUMS_BASENAME="nacar-linux_${VERSION}_amd64.sha256"
 for name in "$BASENAME" "$PACKAGE_BASENAME" "$INFO_BASENAME" "$SUMS_BASENAME"; do
     if [[ -e "$OUT/$name" || -L "$OUT/$name" ]]; then
         printf 'Refusing to overwrite existing output: %s\n' "$OUT/$name" >&2
@@ -134,6 +134,7 @@ if [[ -r /etc/os-release ]]; then
 fi
 BUILD_FINISHED_UTC="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 {
+    printf 'project_name=Nácar GNU/Linux\n'
     printf 'project_version=%s\n' "$VERSION"
     printf 'target_distribution=Debian\n'
     printf 'target_suite=trixie\n'

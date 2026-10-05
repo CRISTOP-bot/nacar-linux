@@ -1,6 +1,6 @@
-# Debian + OpenRC Foundation
+# Nácar GNU/Linux
 
-A small, Debian-first foundation for developing an installable GNU/Linux distribution with OpenRC. This repository is an early engineering baseline, **not a released or production-ready operating system**. The distribution's public name, logo, and visual identity have deliberately not been selected yet; the core build is kept independent of branding so a fork can supply its own.
+**Nácar GNU/Linux** is the working name for a small, Debian-first distribution built around OpenRC. Its GitHub slug and artifact prefix are `nacar-linux`. This repository is an early engineering baseline, **not a released or production-ready operating system**. The name is provisional pending trademark review; no logo or visual identity has been selected, and the core build remains separated from branding so forks can supply their own.
 
 ## Current status
 
@@ -25,7 +25,7 @@ The initial image configuration is experimental. Do not distribute an ISO until 
 - `packages/` — profile policy and package selection.
 - `system/openrc/` — OpenRC design notes and service policy.
 - `installer/`, `src/` — implementation boundaries; no placeholder executable is presented as a feature.
-- `configs/branding/`, `assets/branding/` — forkable identity layer, currently intentionally unbranded.
+- `configs/branding/`, `assets/branding/` — forkable identity layer; working name recorded, artwork and visual identity still unselected.
 - `docs/architecture/`, `docs/licensing/`, `docs/security/` — recorded decisions and release gates.
 - `third-party/`, `THIRD_PARTY.md` — third-party provenance and per-build binary inventory policy.
 - `tests/`, `.github/` — checks and contribution automation.

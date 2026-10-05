@@ -36,8 +36,8 @@ jobs:
         run: |
           set -euo pipefail
           gh release create "$RELEASE_TAG" \
-            dist/openrc-debian_*.iso \
-            dist/openrc-debian_*.packages.tsv \
-            dist/openrc-debian_*.build-info.txt \
-            dist/openrc-debian_*.sha256 \
+            dist/nacar-linux_*.iso \
+            dist/nacar-linux_*.packages.tsv \
+            dist/nacar-linux_*.build-info.txt \
+            dist/nacar-linux_*.sha256 \
             --title "$RELEASE_TAG" --generate-notes

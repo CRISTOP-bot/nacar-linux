@@ -44,7 +44,8 @@ This roadmap is ordered by dependency and proof, not by visual polish. A milesto
 
 ## M5 — distribution identity, packages, and releases
 
-- [ ] Select a distinct name, branding, maintainers, and trademark policy.
+- [x] Choose Nácar GNU/Linux as a provisional working name and `nacar-linux` as the repository/artifact slug; document the limited name search.
+- [ ] Complete trademark review, choose official artwork/branding, and designate maintainers.
 - [ ] Introduce custom packages/repository only for real project-owned functionality, with repository signing and key-rotation design.
 - [ ] Define `distroctl` scope only after Debian-native tools and OpenRC commands are evaluated.
 - [ ] Establish SemVer release process, source archives, changelog, package inventories, checksums, and tested release notes.

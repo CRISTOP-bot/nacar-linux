@@ -13,6 +13,7 @@ class RepositoryPolicyTests(unittest.TestCase):
             "THIRD_PARTY.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md",
             "SECURITY.md", "FORKING.md", "CHANGELOG.md", "docs/build-system.md",
             "docs/architecture/package-rationale.md",
+            "docs/architecture/decisions/0002-provisional-distribution-name.md",
         ):
             with self.subTest(name=name):
                 self.assertTrue((ROOT / name).is_file())
@@ -27,6 +28,18 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertIn("openrc", package_names)
         self.assertIn("live-boot", package_names)
         self.assertNotIn("systemd-sysv", package_names)
+
+    def test_provisional_name_and_artifact_slug_are_consistent(self):
+        name_decision = (ROOT / "docs/architecture/decisions/0002-provisional-distribution-name.md").read_text()
+        readme = (ROOT / "README.md").read_text()
+        build = (ROOT / "build.sh").read_text()
+        release = (ROOT / ".github/workflows/release-iso.yml").read_text()
+        self.assertIn("Nácar GNU/Linux", name_decision)
+        self.assertIn("nacar-linux", name_decision)
+        self.assertIn("Nácar GNU/Linux", readme)
+        self.assertIn('BASENAME="nacar-linux_', build)
+        self.assertIn("dist/nacar-linux_*.iso", release)
+        self.assertNotIn("openrc-debian_", build + release)
 
     def test_every_explicit_base_package_has_a_rationale(self):
         package_lines = (ROOT / "config/package-lists/base.list.chroot").read_text().splitlines()
@@ -55,7 +68,7 @@ class RepositoryPolicyTests(unittest.TestCase):
 
     def test_build_metadata_records_provenance_without_claiming_reproducibility(self):
         script = (ROOT / "build.sh").read_text()
-        for field in ("source_revision", "builder_distribution", "live_build_version", "reproducibility_status=not-established"):
+        for field in ("project_name=Nácar GNU/Linux", "source_revision", "builder_distribution", "live_build_version", "reproducibility_status=not-established"):
             with self.subTest(field=field):
                 self.assertIn(field, script)
         self.assertIn(".build-info.txt", (ROOT / ".github/workflows/release-iso.yml").read_text())

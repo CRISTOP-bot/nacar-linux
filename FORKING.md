@@ -10,4 +10,4 @@ Forks and independent variants are welcome. This repository deliberately separat
 6. Keep your configuration, brand assets, package policy, and original code distinguishable; do not erase attribution to make a fork appear to be upstream.
 7. Publish build instructions, supported suites, security contact, and honest test results for your variant.
 
-The current repository has no selected public distribution name or official artwork; branding is intentionally a later, independent layer.
+The repository uses Nácar GNU/Linux as a provisional working name (`nacar-linux` slug); trademark clearance and official artwork are not established. Forks should choose their own identity and keep it separate from the Debian/OpenRC engineering core.
