@@ -8,4 +8,5 @@
 - Document the rationale and verification status of every explicitly selected base package.
 - Add per-build source/builder metadata and checksums; reproducibility remains unestablished.
 - Add an experimental per-boot Live credential hook with mocked success, failure, console, and rollback tests; QEMU verification remains required.
+- Add a manually dispatched ISO build verifier that checks package inventory and embedded hook without publishing an artifact.
 - No ISO built or boot-tested in this environment; this is not a release.

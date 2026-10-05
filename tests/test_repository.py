@@ -14,6 +14,7 @@ class RepositoryPolicyTests(unittest.TestCase):
             "SECURITY.md", "FORKING.md", "CHANGELOG.md", "docs/build-system.md",
             "docs/architecture/package-rationale.md",
             "docs/architecture/decisions/0002-provisional-distribution-name.md",
+            "tests/verify_live_image.sh",
         ):
             with self.subTest(name=name):
                 self.assertTrue((ROOT / name).is_file())
@@ -75,6 +76,17 @@ class RepositoryPolicyTests(unittest.TestCase):
                 self.assertIn(field, script)
         self.assertIn(".build-info.txt", (ROOT / ".github/workflows/release-iso.yml").read_text())
         self.assertIn("*.build-info.txt", (ROOT / ".gitignore").read_text())
+
+    def test_manual_live_build_verifier_never_releases_or_uploads_iso(self):
+        workflow = (ROOT / ".github/workflows/verify-live-build.yml").read_text()
+        verifier = (ROOT / "tests/verify_live_image.sh").read_text()
+        self.assertIn("workflow_dispatch:", workflow)
+        self.assertIn("bash tests/verify_live_image.sh", workflow)
+        self.assertNotIn("gh release create", workflow)
+        self.assertNotIn("upload-artifact", workflow)
+        self.assertIn("usr/lib/live/config-hooks/9999-nacar-live-credentials", verifier)
+        self.assertIn("openrc-init", verifier)
+        self.assertIn("does not prove boot", verifier)
 
     def test_release_workflow_is_blocked_until_review(self):
         self.assertEqual((ROOT / "RELEASE_STATUS").read_text().strip(), "blocked")
