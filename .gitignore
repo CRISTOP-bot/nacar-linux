@@ -1,6 +1,5 @@
 # Generated live-build trees and temporary build output
-/build/*
-!/build/README.md
+/build/
 /chroot/
 /binary/
 /cache/

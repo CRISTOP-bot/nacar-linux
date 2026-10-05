@@ -21,7 +21,7 @@ The initial image configuration is experimental. Do not distribute an ISO until 
 ## Repository map
 
 - `auto/`, `config/` — Debian Live build configuration and package selection.
-- `build.sh`, `build/` — safe entry point and build notes; generated output is ignored.
+- `build.sh`, `docs/build-system.md` — build entry point and output policy; generated output is ignored.
 - `packages/` — profile policy and package selection.
 - `system/openrc/` — OpenRC design notes and service policy.
 - `installer/`, `src/` — implementation boundaries; no placeholder executable is presented as a feature.

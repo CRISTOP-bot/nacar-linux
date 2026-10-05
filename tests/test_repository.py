@@ -11,7 +11,7 @@ class RepositoryPolicyTests(unittest.TestCase):
         for name in (
             "README.md", "ROADMAP.md", "VERSION", "LICENSE", "COPYRIGHT",
             "THIRD_PARTY.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md",
-            "SECURITY.md", "FORKING.md", "CHANGELOG.md",
+            "SECURITY.md", "FORKING.md", "CHANGELOG.md", "docs/build-system.md",
         ):
             with self.subTest(name=name):
                 self.assertTrue((ROOT / name).is_file())
@@ -35,8 +35,7 @@ class RepositoryPolicyTests(unittest.TestCase):
     def test_generated_outputs_are_ignored(self):
         ignore = (ROOT / ".gitignore").read_text().splitlines()
         self.assertIn("/dist/", ignore)
-        self.assertIn("/build/*", ignore)
-        self.assertIn("!/build/README.md", ignore)
+        self.assertIn("/build/", ignore)
         self.assertIn("*.iso", ignore)
 
     def test_build_protects_existing_artifacts(self):
